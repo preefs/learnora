@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Registration - Learnora</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-page">
+
+    <div class="login-card">
+        <div class="logo-area">
+            <span class="logo-mark" aria-hidden="true">✦</span>
+            <span>Learnora</span>
+        </div>
+        
+        <p class="auth-kicker">Start learning today</p>
+        <h2>Create an account</h2>
+        <p class="subtitle">Enter your details to start learning.</p>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-primary">Register</button>
+            <p id="errorMsg" role="alert" aria-live="polite"></p>
+        </form>
+
+        <div class="footer-link">
+            Already have an account? <a href="login.html">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const fullname = document.getElementById("fullname").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("errorMsg");
+
+            fetch("api/register.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    window.location.href = "login.html";
+                } else {
+                    errorMsg.innerText = data.message || "Registration failed.";
+                }
+            })
+            .catch(() => {
+                errorMsg.innerText = "An error occurred. Please try again.";
+            });
+        });
+    </script>
+</body>
+</html>

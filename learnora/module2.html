@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Module 2: Document Preparation - Learnora</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; }
+        .nav-links { margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007BFF; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .section-box { background: #f9f9f9; padding: 20px; border-radius: 6px; border: 1px solid #ddd; margin-top: 20px; }
+        .quiz-question { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="dashboard.html" class="btn">Back to Dashboard</a>
+        </div>
+        
+        <h1>Module 2: Document Preparation</h1>
+        
+        <div class="section-box">
+            <h3>Lesson Overview</h3>
+            <p>Welcome to Module 2! In this section, you will learn standard practices for drafting, formatting, and structuring professional office documents such as business letters, memos, and reports.</p>
+            
+            <h3>Key Topics</h3>
+            <ul>
+                <li><strong>Standard Business Letter Formatting:</strong> Block and modified block styles, margins, and spacing.</li>
+                <li><strong>Internal Memorandums:</strong> Crafting clear, concise workplace memos with proper header fields (To, From, Date, Subject).</li>
+                <li><strong>Proofreading & Editing:</strong> Catching grammar errors, ensuring tone professionalism, and verifying alignment.</li>
+            </ul>
+        </div>
+
+        <div class="section-box">
+            <h3>Module 2 Assessment Quiz</h3>
+            <form id="quizForm">
+                <div class="quiz-question">
+                    <p><strong>1. Which element is typically omitted in a standard internal business memorandum?</strong></p>
+                    <label><input type="radio" name="q1" value="wrong"> The "Subject" line</label><br>
+                    <label><input type="radio" name="q1" value="correct"> The formal salutation and complimentary close</label><br>
+                    <label><input type="radio" name="q1" value="wrong"> The "Date" field</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>2. In a block-style business letter, how are paragraphs aligned?</strong></p>
+                    <label><input type="radio" name="q2" value="correct"> Flush left, with single spacing and double spacing between paragraphs</label><br>
+                    <label><input type="radio" name="q2" value="wrong"> Indented by half an inch</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>3. What is the primary purpose of professional document proofreading?</strong></p>
+                    <label><input type="radio" name="q3" value="wrong"> To make the document physically longer</label><br>
+                    <label><input type="radio" name="q3" value="correct"> To ensure accuracy, clarity, and correct tone</label>
+                </div>
+
+                <button type="submit" class="btn">Submit Quiz</button>
+            </form>
+            <p id="quizResult" style="font-weight: bold; margin-top: 15px;"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("quizForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+            const resultElement = document.getElementById("quizResult");
+
+            if (!q1 || !q2 || !q3) {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Please answer all questions before submitting.";
+                return;
+            }
+
+            if (q1.value !== "correct" || q2.value !== "correct" || q3.value !== "correct") {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Some answers were incorrect. Review the lesson and try again!";
+                return;
+            }
+
+            resultElement.style.color = "green";
+            resultElement.innerText = "You passed Module 2. Saving your progress...";
+
+            const saveController = new AbortController();
+            const saveTimeout = window.setTimeout(() => saveController.abort(), 5000);
+
+            fetch("api/submit_quiz.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ module_number: 2 }),
+                credentials: "same-origin",
+                signal: saveController.signal
+            })
+            .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok || data.status !== "success") {
+                    throw new Error(data.message || "Unable to save your progress.");
+                }
+                window.location.assign("module3.html");
+            })
+            .catch((err) => {
+                resultElement.style.color = "red";
+                resultElement.innerText = err.message === "Not logged in"
+                    ? "Your session has expired. Sign in again, then retake this quiz to save your progress."
+                    : `You passed Module 2, but progress could not be saved: ${err.name === "AbortError" ? "The request timed out." : err.message}`;
+            })
+            .finally(() => window.clearTimeout(saveTimeout));
+        });
+    </script>
+</body>
+</html>

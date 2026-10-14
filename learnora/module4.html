@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Module 4: Professional Communication - Learnora</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; }
+        .nav-links { margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007BFF; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .section-box { background: #f9f9f9; padding: 20px; border-radius: 6px; border: 1px solid #ddd; margin-top: 20px; }
+        .quiz-question { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="dashboard.html" class="btn">Back to Dashboard</a>
+        </div>
+        
+        <h1>Module 4: Professional Communication</h1>
+        
+        <div class="section-box">
+            <h3>Lesson Overview</h3>
+            <p>Welcome to Module 4! In this section, you will learn effective workplace communication strategies, professional email etiquette, telephone etiquette, and interpersonal conflict resolution in an office setting.</p>
+            
+            <h3>Key Topics</h3>
+            <ul>
+                <li><strong>Business Email Etiquette:</strong> Writing clear subject lines, professional greetings, concise bodies, and proper sign-offs.</li>
+                <li><strong>Telephone & Virtual Meeting Etiquette:</strong> Professional greeting protocols, active listening, and clear verbal communication.</li>
+                <li><strong>Interpersonal Workplace Communication:</strong> Constructive feedback, professional tone, and collaborative problem-solving.</li>
+            </ul>
+        </div>
+
+        <div class="section-box">
+            <h3>Module 4 Assessment Quiz</h3>
+            <form id="quizForm">
+                <div class="quiz-question">
+                    <p><strong>1. Which component is crucial for a professional business email subject line?</strong></p>
+                    <label><input type="radio" name="q1" value="wrong"> Writing it entirely in uppercase letters for urgency</label><br>
+                    <label><input type="radio" name="q1" value="correct"> Being clear, concise, and descriptive of the email's content</label><br>
+                    <label><input type="radio" name="q1" value="wrong"> Leaving it completely blank</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>2. What is a key practice of effective telephone etiquette in an office?</strong></p>
+                    <label><input type="radio" name="q2" value="correct"> Answering promptly with a professional greeting and identifying yourself/department</label><br>
+                    <label><input type="radio" name="q2" value="wrong"> Interrupting the caller quickly to save time</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>3. How should constructive feedback be delivered in a professional environment?</strong></p>
+                    <label><input type="radio" name="q3" value="wrong"> Publicly during large group meetings to set an example</label><br>
+                    <label><input type="radio" name="q3" value="correct"> Professionally, focusing on specific behaviors rather than personal attacks</label>
+                </div>
+
+                <button type="submit" class="btn">Submit Quiz</button>
+            </form>
+            <p id="quizResult" style="font-weight: bold; margin-top: 15px;"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("quizForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+            const resultElement = document.getElementById("quizResult");
+
+            if (!q1 || !q2 || !q3) {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Please answer all questions before submitting.";
+                return;
+            }
+
+            if (q1.value === "correct" && q2.value === "correct" && q3.value === "correct") {
+                resultElement.style.color = "green";
+                resultElement.innerText = "You passed Module 4. Saving your progress...";
+                const saveController = new AbortController();
+                const saveTimeout = window.setTimeout(() => saveController.abort(), 5000);
+
+                fetch("api/submit_quiz.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ module_number: 4 }),
+                    credentials: "same-origin",
+                    signal: saveController.signal
+                })
+                .then(async (res) => {
+                    const data = await res.json();
+                    if (!res.ok || data.status !== "success") {
+                        throw new Error(data.message || "Unable to save your progress.");
+                    }
+                    window.location.assign("module5.html");
+                })
+                .catch((err) => {
+                    resultElement.style.color = "red";
+                    resultElement.innerText = err.message === "Not logged in"
+                        ? "Your session has expired. Sign in again, then retake this quiz to save your progress."
+                        : `You passed Module 4, but progress could not be saved: ${err.name === "AbortError" ? "The request timed out." : err.message}`;
+                })
+                .finally(() => window.clearTimeout(saveTimeout));
+            } else {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Some answers were incorrect. Review the lesson and try again!";
+            }
+        });
+    </script>
+</body>
+</html>

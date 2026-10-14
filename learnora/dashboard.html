@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <title>Dashboard - Learnora</title>
+    <style>
+        :root {
+            --bg-color: #f7f8f5;
+            --sidebar-bg: #fff;
+            --card-bg: #fff;
+            --text-main: #263a37;
+            --text-muted: #84918e;
+            --primary-orange: #ee7953;
+            --primary-orange-hover: #dd6844;
+            --border-color: #e6ece8;
+            --mint: #e0f1eb;
+            --deep-green: #27645a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        aside {
+            position: sticky;
+            top: 0;
+            width: 224px;
+            min-width: 224px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 28px 16px 20px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 800;
+            font-size: 19px;
+            color: #254c47;
+            margin: 0 0 32px;
+            padding-left: 7px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-mark {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #ee7953;
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 5px 12px #ee795333;
+        }
+
+        .user-profile-box {
+            border: 1px solid #e9efeb;
+            border-radius: 13px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #fff;
+        }
+
+        .user-info { min-width: 0; flex: 1; }
+        .user-info .name { font-weight: 700; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-info .role { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: #d9eee8;
+            color: #32766b;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .nav-section-title { font-size: 10px; text-transform: uppercase; color: #9aa6a2; letter-spacing: 1.4px; font-weight: 700; padding-left: 10px; margin: 0 0 9px; }
+        .nav-links-list { list-style: none; padding: 0; margin: 0 0 28px; }
+        .nav-links-list li { margin-bottom: 4px; }
+        .nav-links-list a, .nav-links-list button {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 11px;
+            border-radius: 9px;
+            text-decoration: none;
+            color: #62716d;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        .nav-icon { width: 17px; text-align: center; font-size: 15px; color: #82928d; }
+        .nav-links-list a.active { background: #eaf5f1; color: #28695f; }
+        .nav-links-list a.active .nav-icon { color: #388579; }
+        .nav-links-list a:hover, .nav-links-list button:hover { background: #f4f7f5; color: var(--text-main); }
+        .sidebar-footer { border-top: 1px solid #edf1ee; padding: 14px 8px 0; }
+        .sidebar-note { background: #fbf4e5; border-radius: 12px; padding: 12px; margin-bottom: 14px; }
+        .sidebar-note-mark { color: #dfaa3e; font-size: 16px; margin-bottom: 6px; }
+        .sidebar-note strong { display: block; font-size: 13px; margin-bottom: 4px; }
+        .sidebar-note p { color: #85847c; font-size: 12px; line-height: 1.5; margin: 0; }
+        .sidebar-copyright { color: #a0aaa6; font-size: 10px; line-height: 1.6; }
+
+        main {
+            flex: 1;
+            min-width: 0;
+            height: 100vh;
+            padding: 0 48px 48px;
+            overflow-y: auto;
+        }
+
+        .workspace-bar {
+            height: 62px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e9eeeb;
+            color: #8b9894;
+            font-size: 13px;
+            margin: 0 -48px 0;
+            padding: 0 48px;
+        }
+        .workspace-bar strong { color: #344b46; font-weight: 700; }
+        .workspace-actions { display: flex; align-items: center; gap: 19px; color: #82918c; }
+        .workspace-actions a { color: inherit; text-decoration: none; font-size: 14px; }
+        .workspace-actions a:hover { color: var(--primary-orange); }
+        .workspace-avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; color: #34756a; background: #d9eee8; font-size: 12px; font-weight: 700; }
+        .dashboard-content { width: min(100%, 1120px); margin: 0 auto; }
+
+        .header-greeting {
+            position: relative;
+            margin: 42px 0 30px;
+        }
+        .header-greeting .date { font-size: 11px; text-transform: uppercase; color: #8b9995; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 10px; }
+        .header-greeting h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.7px; margin: 0 0 7px; color: #263b37; }
+        .header-greeting p { color: #8b9995; margin: 0; font-size: 15px; }
+
+        .promo-banner {
+            min-height: 260px;
+            position: relative;
+            overflow: hidden;
+            background: #dff1eb;
+            border-radius: 17px;
+            padding: 40px 42px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            border: 1px solid #d3e9e1;
+        }
+        .promo-content { width: min(58%, 510px); position: relative; z-index: 1; }
+        .promo-tag { font-size: 11px; text-transform: uppercase; color: #39776c; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 16px; display: block; }
+        .promo-tag::before { content: ""; display: inline-block; width: 6px; height: 6px; background: var(--primary-orange); border-radius: 50%; margin: 0 8px 1px 0; }
+        .promo-banner h2 { font-size: clamp(30px, 2.8vw, 38px); line-height: 1.18; letter-spacing: -0.8px; font-weight: 500; max-width: 540px; margin: 0 0 12px; color: #254943; }
+        .promo-banner h2 span { color: var(--primary-orange); }
+        .promo-banner p { font-size: 14px; max-width: 460px; color: #68827b; margin: 0 0 20px; line-height: 1.6; }
+        .btn-primary {
+            background-color: var(--primary-orange);
+            color: white; border: none; padding: 13px 18px;
+            border-radius: 8px; font-weight: 700; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 10px; font-size: 13px;
+            box-shadow: 0 5px 12px #e87a5630;
+            transition: background-color .2s, transform .2s;
+        }
+        .btn-primary:hover { background-color: var(--primary-orange-hover); transform: translateY(-1px); }
+
+        .hero-art {
+            position: absolute;
+            width: 280px;
+            height: 220px;
+            right: 4%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .hero-orbit, .hero-orbit::before, .hero-orbit::after {
+            position: absolute;
+            border: 1px solid #b9dcd1;
+            border-radius: 50%;
+            content: "";
+        }
+        .hero-orbit { width: 210px; height: 210px; top: 5px; left: 38px; }
+        .hero-orbit::before { inset: 14px; }
+        .hero-orbit::after { inset: 29px; }
+        .hero-sun { position: absolute; width: 140px; height: 140px; border-radius: 50%; background: #f5cd76; top: 39px; left: 73px; }
+        .hero-person { position: absolute; width: 70px; height: 115px; left: 111px; top: 91px; }
+        .hero-head { position: absolute; z-index: 2; left: 17px; top: 0; width: 38px; height: 46px; border-radius: 45% 45% 48% 48%; background: #c77b52; }
+        .hero-hair { position: absolute; z-index: 3; left: 13px; top: -1px; width: 46px; height: 20px; border-radius: 18px 18px 12px 12px; background: #284b47; }
+        .hero-body { position: absolute; z-index: 1; top: 43px; left: 1px; width: 69px; height: 86px; border-radius: 28px 28px 0 0; background: #f8f5eb; transform: rotate(-4deg); }
+        .hero-arm { position: absolute; z-index: 4; top: 58px; left: -4px; width: 64px; height: 12px; border-radius: 12px; background: #c77b52; transform: rotate(38deg); transform-origin: right center; }
+        .hero-chip { position: absolute; z-index: 5; display: flex; gap: 6px; align-items: center; padding: 8px 10px; border-radius: 9px; background: #fff; color: #476760; font-size: 9px; font-weight: 700; box-shadow: 0 5px 18px #47796b18; }
+        .hero-chip-top { top: 36px; right: 0; transform: rotate(4deg); }
+        .hero-chip-bottom { bottom: 12px; left: 1px; transform: rotate(-5deg); }
+        .hero-chip span { color: var(--primary-orange); font-size: 14px; }
+        .hero-spark { position: absolute; color: var(--primary-orange); font-size: 19px; }
+        .hero-spark-one { right: 4px; top: 17px; }
+        .hero-spark-two { right: 29px; bottom: 8px; font-size: 13px; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 44px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 13px;
+            min-height: 104px;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: 36px 1fr;
+            grid-template-rows: auto auto;
+            column-gap: 12px;
+            align-content: center;
+        }
+        .stat-icon { grid-row: 1 / 3; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 9px; font-size: 17px; }
+        .stat-card:nth-child(1) .stat-icon { background: #e1f2ec; color: #438c7e; }
+        .stat-card:nth-child(2) .stat-icon { background: #fbf0d5; color: #c58b2d; }
+        .stat-card:nth-child(3) .stat-icon { background: #fce8e1; color: #d77a5c; }
+        .stat-card .label { font-size: 12px; color: #899792; margin: 0 0 6px; }
+        .stat-card .value { font-size: 18px; font-weight: 750; color: #304742; }
+        .stat-footnote { grid-column: 2; color: #a0aaa6; font-size: 10px; margin-top: 5px; text-align: right; }
+        .progress-bar-bg { grid-column: 2; background: #e8eeea; height: 5px; border-radius: 5px; margin-top: 9px; overflow: hidden; }
+        .progress-bar-fill { background: #65ad9b; height: 100%; width: 20%; border-radius: inherit; transition: width .4s ease; }
+
+        .curriculum-header { display: flex; justify-content: space-between; align-items: end; margin-bottom: 16px; }
+        .section-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #93a19c; font-weight: 800; margin: 0 0 7px; }
+        .curriculum-header h3 { margin: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.4px; color: #304742; text-transform: none; }
+        .curriculum-header a { font-size: 13px; color: var(--primary-orange); text-decoration: none; font-weight: 700; }
+        .module-list { display: grid; gap: 12px; }
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 13px;
+            padding: 18px 20px;
+            margin: 0;
+            min-height: 110px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: border-color .2s, box-shadow .2s, transform .2s;
+        }
+        .module-card:not(.locked-card):hover { border-color: #d0e5dc; box-shadow: 0 8px 20px #264d3e0b; transform: translateY(-1px); }
+        .module-card:focus-visible, .btn-primary:focus-visible, .workspace-actions a:focus-visible { outline: 3px solid #f3ad91; outline-offset: 3px; }
+        .locked-card { opacity: .62; pointer-events: none; background: #fbfcfa; }
+        .module-left { display: flex; gap: 16px; align-items: center; min-width: 0; }
+        .module-icon {
+            width: 48px; height: 48px; border-radius: 11px;
+            display: grid; place-items: center; font-size: 20px;
+            flex-shrink: 0;
+        }
+        .module-meta { font-size: 10px; text-transform: uppercase; color: #91a09b; font-weight: 800; margin-bottom: 5px; letter-spacing: 1px; }
+        .module-title { font-size: 16px; font-weight: 700; margin: 0 0 4px; color: #304742; }
+        .module-desc { font-size: 13px; color: #899792; margin: 0 0 7px; }
+        .module-info-footer { font-size: 11px; color: #94a09c; display: flex; gap: 14px; }
+        .btn-action { font-size: 13px; font-weight: 700; text-decoration: none; padding: 10px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 9px; white-space: nowrap; }
+        .btn-review { color: var(--primary-orange); background: transparent; }
+        .btn-review:hover { background: #fff3ee; }
+        .btn-resume { color: white; background: var(--primary-orange); box-shadow: 0 4px 10px #e87a5628; }
+        .btn-resume:hover { background: var(--primary-orange-hover); }
+        .lock-text { font-size: 11px; color: #a1aaa7; font-weight: 600; white-space: nowrap; }
+        .status-badge { font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 7px; white-space: nowrap; }
+        .status-completed { background: #e8f4ee; color: #41806b; }
+        .status-inprogress { background: #fbf0d5; color: #aa7b2d; }
+        .status-locked { background: #f1f3f4; color: #5f6368; }
+
+        .dashboard-bottom { display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; margin-top: 16px; }
+        .encouragement-card, .up-next-card { min-height: 130px; border-radius: 13px; padding: 20px; }
+        .encouragement-card { position: relative; overflow: hidden; background: #f8eddd; color: #765c3c; }
+        .encouragement-card::after { content: "✦"; position: absolute; right: 16px; bottom: -19px; color: #efcf9f; font-size: 74px; }
+        .encouragement-card strong { display: block; max-width: 270px; font: 500 19px/1.35 Georgia, serif; }
+        .encouragement-card p { color: #9b8060; font-size: 12px; margin: 10px 0 0; }
+        .up-next-card { border: 1px solid var(--border-color); background: #fff; }
+        .up-next-card .section-eyebrow { margin-bottom: 7px; }
+        .up-next-card strong { display: block; font-size: 16px; color: #344b46; }
+        .up-next-card p { font-size: 13px; color: #899792; margin: 6px 0 12px; }
+        .up-next-card a { color: #438579; text-decoration: none; font-size: 12px; font-weight: 700; }
+
+        @media (max-width: 900px) {
+            aside { width: 190px; min-width: 190px; }
+            main { padding-left: 25px; padding-right: 25px; }
+            .workspace-bar { margin-left: -25px; margin-right: -25px; padding-left: 25px; padding-right: 25px; }
+            .dashboard-content { width: min(100%, 1120px); }
+            .hero-art { right: 0; transform: translate(16%, -50%) scale(.86); }
+            .promo-content { width: 68%; }
+        }
+        @media (max-width: 680px) {
+            body { display: block; overflow-x: hidden; }
+            aside { position: static; width: 100%; min-width: 0; height: auto; padding: 12px 16px 8px; border-right: 0; border-bottom: 1px solid var(--border-color); }
+            aside > div:first-child { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; gap: 5px; }
+            .logo-area { margin: 0; padding: 0; font-size: 16px; }
+            .logo-mark { width: 28px; height: 28px; }
+            .logo-area { grid-column: span 3; }
+            .user-profile-box { grid-column: span 3; margin: 0; padding: 5px 8px; border: 0; justify-self: end; max-width: 100%; }
+            .user-info .role, .nav-section-title, .sidebar-footer { display: none; }
+            .nav-links-list { display: contents; }
+            .nav-links-list li { min-width: 0; margin: 0; }
+            .nav-links-list a, .nav-links-list button { justify-content: center; width: 100%; padding: 8px 3px; font-size: 0; }
+            .nav-icon { font-size: 16px; }
+            main { height: auto; padding: 0 16px 28px; overflow: visible; }
+            .workspace-bar { height: 45px; margin: 0 -16px; padding: 0 16px; }
+            .header-greeting { margin: 25px 0 20px; }
+            .header-greeting .date { font-size: 10px; }
+            .header-greeting h1 { font-size: 25px; }
+            .header-greeting p { font-size: 14px; }
+            .promo-banner { min-height: 220px; padding: 25px; }
+            .promo-content { width: 78%; }
+            .promo-tag { font-size: 10px; }
+            .promo-banner h2 { font-size: 25px; }
+            .promo-banner p { max-width: 280px; font-size: 13px; }
+            .btn-primary { font-size: 12px; padding: 11px 14px; }
+            .hero-art { opacity: .33; right: -69px; transform: translateY(-50%) scale(.72); }
+            .stats-row { gap: 9px; margin-bottom: 32px; }
+            .stat-card { min-height: 88px; padding: 12px 10px; grid-template-columns: 28px 1fr; column-gap: 8px; }
+            .stat-icon { width: 28px; height: 28px; font-size: 13px; }
+            .stat-card .label { font-size: 10px; }
+            .stat-card .value { font-size: 15px; }
+            .stat-footnote { font-size: 9px; }
+            .curriculum-header h3 { font-size: 22px; }
+            .curriculum-header a { font-size: 12px; }
+            .module-card { padding: 14px; min-height: 94px; }
+            .module-left { gap: 11px; }
+            .module-icon { width: 38px; height: 38px; font-size: 17px; }
+            .module-meta { font-size: 9px; }
+            .module-title { font-size: 14px; }
+            .module-desc { max-width: 250px; font-size: 12px; line-height: 1.4; }
+            .module-info-footer { font-size: 10px; }
+            .btn-action { padding: 8px 10px; font-size: 12px; }
+            .lock-text { font-size: 10px; }
+            .dashboard-bottom { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 390px) {
+            .user-info .name { max-width: 100px; font-size: 13px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .stat-card { grid-template-columns: 32px 1fr; min-height: 76px; }
+            .stat-icon { width: 30px; height: 30px; }
+            .hero-art { opacity: .2; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside>
+        <div>
+            <div class="logo-area">
+                <span class="logo-mark" aria-hidden="true">✦</span>
+                <span>LearnNora</span>
+            </div>
+
+            <div class="user-profile-box">
+                <div class="user-info">
+                    <div class="name" id="userNameDisplay">Loading...</div>
+                    <div class="role">Office Administration</div>
+                </div>
+                <div class="avatar" id="userAvatar">--</div>
+            </div>
+
+            <div class="nav-section-title">Workspace</div>
+            <ul class="nav-links-list">
+                <li><a href="dashboard.html" class="active"><span class="nav-icon" aria-hidden="true">▦</span>Dashboard</a></li>
+                <li><a href="#curriculum"><span class="nav-icon" aria-hidden="true">▤</span>My course</a></li>
+                <li><a href="certificate.html"><span class="nav-icon" aria-hidden="true">♜</span>Certificates</a></li>
+            </ul>
+
+            <div class="nav-section-title">Support</div>
+            <ul class="nav-links-list">
+                <li><button id="logoutBtn"><span class="nav-icon" aria-hidden="true">↪</span>Logout</button></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="sidebar-note">
+                <div class="sidebar-note-mark" aria-hidden="true">✦</div>
+                <strong>Small steps add up.</strong>
+                <p>Keep learning at your own pace. You’re making progress.</p>
+            </div>
+            <div class="sidebar-copyright">© 2026 LearnNora<br>Learn by doing.</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+        <div class="workspace-bar">
+            <div>Workspace <span aria-hidden="true">/</span> <strong>Dashboard</strong></div>
+            <div class="workspace-actions">
+                <a href="#curriculum">⌕ &nbsp;Search</a>
+                <span aria-hidden="true">◷</span>
+                <span id="workspaceAvatar" class="workspace-avatar" aria-hidden="true">--</span>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="header-greeting">
+                <div class="date" id="currentDate">Monday, October 7, 2026</div>
+                <h1>Good morning, <span id="greetingName">Student</span> <span aria-hidden="true" style="color:#eead46;">✦</span></h1>
+                <p>Ready to make progress? You're doing great.</p>
+            </div>
+
+            <div class="promo-banner">
+                <div class="promo-content">
+                    <span class="promo-tag">Your learning journey</span>
+                    <h2>Become the confident <span>professional</span> you're meant to be.</h2>
+                    <p>Build practical skills, one lesson at a time. Your next opportunity starts here.</p>
+                    <a href="module1.html" class="btn-primary">Continue learning</a>
+                </div>
+                <div class="hero-art" aria-hidden="true">
+                    <div class="hero-orbit"></div>
+                    <div class="hero-sun"></div>
+                    <div class="hero-person">
+                        <div class="hero-body"></div>
+                        <div class="hero-head"></div>
+                        <div class="hero-hair"></div>
+                        <div class="hero-arm"></div>
+                    </div>
+                    <div class="hero-chip hero-chip-top"><span>♜</span> Skills unlocked</div>
+                    <div class="hero-chip hero-chip-bottom"><span>✓</span> Keep going!</div>
+                    <span class="hero-spark hero-spark-one">✦</span>
+                    <span class="hero-spark hero-spark-two">✦</span>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-icon" aria-hidden="true">▤</span>
+                    <div class="label">Course progress</div>
+                    <div id="courseProgressText" class="value">0%</div>
+                    <div class="progress-bar-bg"><div id="courseProgressBar" class="progress-bar-fill" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-icon" aria-hidden="true">◷</span>
+                    <div class="label">Learning time</div>
+                    <div class="value">3h 40m</div>
+                    <div class="stat-footnote">this week</div>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-icon" aria-hidden="true">♜</span>
+                    <div class="label">Completed</div>
+                    <div id="completedModulesText" class="value">0 modules</div>
+                    <div class="stat-footnote">of 5 modules</div>
+                </div>
+            </div>
+
+            <div id="curriculum" class="curriculum-header">
+                <div>
+                    <div class="section-eyebrow">Your curriculum</div>
+                    <h3>Keep learning</h3>
+                </div>
+                <a href="#module-1">View all</a>
+            </div>
+
+            <div class="module-list">
+    <!-- MODULE 01 (Completed - Review) -->
+    <a href="module1.html" class="module-card" id="module-1" data-module="1">
+        <div class="module-left">
+            <div class="module-icon" style="background: #e6f4f1; color: #115e59;">⌨️</div>
+            <div>
+                <div class="module-meta">
+                    MODULE 01 &nbsp; <span style="color: #137333; font-weight: 600;">✓ Completed</span>
+                </div>
+                <div class="module-title">Keyboard & Typing Skills</div>
+                <p class="module-desc">Build confidence with keyboard familiarity, accuracy, and speed.</p>
+                <div class="module-info-footer">
+                    <span>📖 4 lessons</span> &nbsp;&nbsp; <span>⏱️ 45 min</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="btn-action btn-review">Review </span>
+        </div>
+    </a>
+
+        <!-- MODULE 02 (In Progress - Resume) -->
+    <a href="module2.html" class="module-card" data-module="2">
+        <div class="module-left">
+            <div class="module-icon" style="background: #fef3c7; color: #b45309;">📄</div>
+            <div>
+                <div class="module-meta">
+                    MODULE 02 &nbsp; <span style="color: #b45309; font-weight: 600;">In Progress</span>
+                </div>
+                <div class="module-title">Document Preparation</div>
+                <p class="module-desc">Create polished documents with simple, professional formatting.</p>
+                <div class="module-info-footer">
+                    <span>📖 5 lessons</span> &nbsp;&nbsp; <span>⏱️ 1 hr 10 min</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="btn-action btn-resume">Resume</span>
+        </div>
+    </a>
+
+    <!-- MODULE 03 (Locked) -->
+    <a class="module-card locked-card" data-module="3" aria-disabled="true" tabindex="-1">
+        <div class="module-left">
+            <div class="module-icon" style="background: #f3f4f6; color: #4b5563;">📁</div>
+            <div>
+                <div class="module-meta">
+                    MODULE 03
+                </div>
+                <div class="module-title">File & Record Management</div>
+                <p class="module-desc">Learn practical ways to organize and manage office records.</p>
+                <div class="module-info-footer">
+                    <span>📖 4 lessons</span> &nbsp;&nbsp; <span>⏱️ 50 min</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="lock-text">Complete previous</span>
+        </div>
+    </a>
+
+    <!-- MODULE 04 (Locked) -->
+    <a class="module-card locked-card" data-module="4" aria-disabled="true" tabindex="-1">
+        <div class="module-left">
+            <div class="module-icon" style="background: #f3f4f6; color: #4b5563;">💬</div>
+            <div>
+                <div class="module-meta">
+                    MODULE 04
+                </div>
+                <div class="module-title">Professional Communication</div>
+                <p class="module-desc">Write clear emails and communicate with confidence at work.</p>
+                <div class="module-info-footer">
+                    <span>📖 5 lessons</span> &nbsp;&nbsp; <span>⏱️ 1 hr</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="lock-text">Complete previous</span>
+        </div>
+    </a>
+
+    <!-- MODULE 05 (Locked) -->
+    <a class="module-card locked-card" data-module="5" aria-disabled="true" tabindex="-1">
+        <div class="module-left">
+            <div class="module-icon" style="background: #f3f4f6; color: #4b5563;">⏱️</div>
+            <div>
+                <div class="module-meta">
+                    MODULE 05
+                </div>
+                <div class="module-title">Office Productivity</div>
+                <p class="module-desc">Bring your new skills together to work smarter every day.</p>
+                <div class="module-info-footer">
+                    <span>📖 4 lessons</span> &nbsp;&nbsp; <span>⏱️ 55 min</span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <span class="lock-text">Complete previous</span>
+        </div>
+    </a>
+            </div>
+
+        <a href="final_assessment.html" class="module-card" style="background: #faf7f5;">
+            <div class="module-left">
+                <div class="module-icon">🏆</div>
+                <div>
+                    <div class="module-meta">Final Exam</div>
+                    <div class="module-title">Comprehensive Final Assessment</div>
+                    <p class="module-desc">Test your knowledge across all 5 modules.</p>
+                </div>
+            </div>
+            <span id="finalExamStatus" class="status-badge status-inprogress">Take exam</span>
+        </a>
+
+            <div class="dashboard-bottom">
+                <div class="encouragement-card">
+                    <strong>Success is built one small step at a time.</strong>
+                    <p>Keep showing up for your learning journey.</p>
+                </div>
+                <div class="up-next-card">
+                    <div class="section-eyebrow">Up next</div>
+                    <strong id="upNextTitle">Your next lesson</strong>
+                    <p id="upNextDescription">Continue where you left off in your course.</p>
+                    <a id="upNextLink" href="module1.html">Continue learning</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        // Check session, load user info
+        fetch("api/check_session.php")
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "logged_out") {
+                    window.location.href = "login.html";
+                } else if (data.status === "logged_in") {
+                    const fullName = data.fullname;
+                    document.getElementById("userNameDisplay").innerText = fullName;
+                    document.getElementById("greetingName").innerText = fullName.split(" ")[0];
+                    
+                    // Generate Initials for Avatar
+                    const initials = fullName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+                    document.getElementById("userAvatar").innerText = initials;
+                    document.getElementById("workspaceAvatar").innerText = initials;
+                }
+            })
+            .catch(err => console.error("Session check failed:", err));
+
+        fetch("api/get_certificate.php")
+            .then(async (res) => {
+                if (res.status === 404) return;
+                const data = await res.json();
+                if (!res.ok || data.status !== "success") {
+                    throw new Error(data.message || "Unable to check certificate status.");
+                }
+                const statusBadge = document.getElementById("finalExamStatus");
+                if (statusBadge) {
+                    statusBadge.className = "status-badge status-completed";
+                    statusBadge.innerText = "Passed";
+                }
+            })
+            .catch(err => console.error("Certificate status check failed:", err));
+
+        // Set dynamic date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', options).toUpperCase();
+
+            // Fetch user specific module statuses and update UI
+            fetch("api/get_modules.php")
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const userModules = data.modules; 
+                    
+                    const statusMap = {};
+                    userModules.forEach(m => {
+                        statusMap[m.module_number] = m.status;
+                    });
+
+                    // Calculate completed modules dynamically
+                    let completedCount = 0;
+                    userModules.forEach(m => {
+                        if (m.status === 'completed') completedCount++;
+                    });
+                    
+                    const progressPercent = Math.round((completedCount / 5) * 100);
+                    
+                    // Update stat cards on the dashboard
+                    const progressText = document.getElementById("courseProgressText");
+                    const progressBar = document.getElementById("courseProgressBar");
+                    const completedText = document.getElementById("completedModulesText");
+                    
+                    if (progressText) progressText.innerText = progressPercent + "%";
+                    if (progressBar) progressBar.style.width = progressPercent + "%";
+                    if (completedText) completedText.innerText = completedCount + " modules";
+
+                    // Loop through all 5 modules explicitly to render their cards
+                    for (let i = 1; i <= 5; i++) {
+                        const card = document.querySelector(`.module-card[data-module="${i}"]`);
+                        if (!card) continue;
+
+                        const badge = card.querySelector('.module-meta');
+                        const actionBtn = card.querySelector('.btn-action, .lock-text');
+                        
+                        let status = statusMap[i] || (i === 1 ? 'in_progress' : 'locked');
+
+                        if (status === 'completed') {
+                            card.classList.remove('locked-card');
+                            card.style.borderColor = '';
+                            card.href = `module${i}.html`;
+                            card.removeAttribute('aria-disabled');
+                            card.removeAttribute('tabindex');
+                            if(badge) badge.innerHTML = `MODULE 0${i} &nbsp; <span style="color: #137333; font-weight: 600;">✓ Completed</span>`;
+                            if (actionBtn) {
+                                actionBtn.className = 'btn-action btn-review';
+                                actionBtn.innerText = 'Review';
+                                actionBtn.href = `module${i}.html`;
+                            }
+                        } else if (status === 'in_progress') {
+                            card.classList.remove('locked-card');
+                            card.style.borderColor = 'var(--primary-orange)';
+                            card.href = `module${i}.html`;
+                            card.removeAttribute('aria-disabled');
+                            card.removeAttribute('tabindex');
+                            if(badge) badge.innerHTML = `MODULE 0${i} &nbsp; <span style="color: #b45309; font-weight: 600;">In Progress</span>`;
+                            if (actionBtn) {
+                                actionBtn.className = 'btn-action btn-resume';
+                                actionBtn.innerText = 'Resume';
+                                actionBtn.href = `module${i}.html`;
+                            }
+                        } else {
+                            card.classList.add('locked-card');
+                            card.style.borderColor = '';
+                            card.removeAttribute('href');
+                            card.setAttribute('aria-disabled', 'true');
+                            card.setAttribute('tabindex', '-1');
+                            if(badge) badge.innerText = `MODULE 0${i}`;
+                            if (actionBtn) {
+                                actionBtn.className = 'lock-text';
+                                actionBtn.innerText = 'Complete previous';
+                            }
+                        }
+
+                        const activeModule = userModules.find(module => module.status === "in_progress");
+                        const nextModuleNumber = activeModule
+                            ? Number(activeModule.module_number)
+                            : Math.min(completedCount + 1, 5);
+                        const isCourseComplete = completedCount >= 5;
+                        const nextLink = document.getElementById("upNextLink");
+                        const nextTitle = document.getElementById("upNextTitle");
+                        const nextDescription = document.getElementById("upNextDescription");
+                        const continueLink = document.querySelector(".promo-banner .btn-primary");
+
+                        if (isCourseComplete) {
+                            if (nextTitle) nextTitle.innerText = "Final assessment";
+                            if (nextDescription) nextDescription.innerText = "You’ve completed all five modules. Take the final exam when you’re ready.";
+                            if (nextLink) {
+                                nextLink.href = "final_assessment.html";
+                                nextLink.innerText = "Take final assessment";
+                            }
+                            if (continueLink) continueLink.href = "final_assessment.html";
+                        } else if (nextModuleNumber >= 1) {
+                            const nextCard = document.querySelector(`.module-card[data-module="${nextModuleNumber}"]`);
+                            const nextModuleTitle = nextCard?.querySelector(".module-title")?.innerText || `Module ${nextModuleNumber}`;
+                            if (nextTitle) nextTitle.innerText = nextModuleTitle;
+                            if (nextDescription) nextDescription.innerText = "Pick up your course and continue building your skills.";
+                            if (nextLink) {
+                                nextLink.href = `module${nextModuleNumber}.html`;
+                                nextLink.innerText = activeModule ? "Resume module" : "Start next module";
+                            }
+                            if (continueLink) continueLink.href = `module${nextModuleNumber}.html`;
+                        }
+                    }
+                }
+            })
+            .catch(err => console.error("Module progress could not be loaded:", err));
+
+        // Logout functionality
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            fetch("api/logout.php").then(() => {
+                window.location.href = "login.html";
+            });
+        });
+    </script>
+</body>
+</html>

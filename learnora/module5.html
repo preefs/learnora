@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Module 5: Office Productivity - Learnora</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; }
+        .nav-links { margin-bottom: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; background: #007BFF; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .section-box { background: #f9f9f9; padding: 20px; border-radius: 6px; border: 1px solid #ddd; margin-top: 20px; }
+        .quiz-question { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="dashboard.html" class="btn">Back to Dashboard</a>
+        </div>
+        
+        <h1>Module 5: Office Productivity</h1>
+        
+        <div class="section-box">
+            <h3>Lesson Overview</h3>
+            <p>Welcome to Module 5! In this final section, you will learn time management techniques, daily prioritization strategies, calendar scheduling, and tools to maximize daily workflow efficiency in an office environment.</p>
+            
+            <h3>Key Topics</h3>
+            <ul>
+                <li><strong>Task Prioritization & Time Management:</strong> Using methods like the Eisenhower Matrix to categorize urgent vs. important tasks.</li>
+                <li><strong>Calendar & Schedule Management:</strong> Managing meetings, appointments, reminders, and avoiding scheduling conflicts.</li>
+                <li><strong>Workflow Automation & Tools:</strong> Leveraging office productivity suites and digital task managers to reduce manual repetition.</li>
+            </ul>
+        </div>
+
+        <div class="section-box">
+            <h3>Module 5 Assessment Quiz</h3>
+            <form id="quizForm">
+                <div class="quiz-question">
+                    <p><strong>1. According to the Eisenhower Matrix, how should you handle tasks that are important but not urgent?</strong></p>
+                    <label><input type="radio" name="q1" value="wrong"> Ignore them completely</label><br>
+                    <label><input type="radio" name="q1" value="correct"> Schedule a specific time to do them</label><br>
+                    <label><input type="radio" name="q1" value="wrong"> Delegate them immediately without review</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>2. What is a primary objective of effective calendar management?</strong></p>
+                    <label><input type="radio" name="q2" value="correct"> Preventing double-booking and ensuring adequate preparation time for meetings</label><br>
+                    <label><input type="radio" name="q2" value="wrong"> Packing every single minute of the day with back-to-back meetings</label>
+                </div>
+
+                <div class="quiz-question">
+                    <p><strong>3. How do digital productivity tools improve daily office workflow?</strong></p>
+                    <label><input type="radio" name="q3" value="wrong"> By eliminating the need for any human oversight</label><br>
+                    <label><input type="radio" name="q3" value="correct"> By streamlining task tracking, communication, and routine administrative processes</label>
+                </div>
+
+                <button type="submit" class="btn">Submit Quiz</button>
+            </form>
+            <p id="quizResult" style="font-weight: bold; margin-top: 15px;"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("quizForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+            const resultElement = document.getElementById("quizResult");
+
+            if (!q1 || !q2 || !q3) {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Please answer all questions before submitting.";
+                return;
+            }
+
+            if (q1.value === "correct" && q2.value === "correct" && q3.value === "correct") {
+                resultElement.style.color = "green";
+                resultElement.innerText = "You passed Module 5. Saving your progress...";
+                const saveController = new AbortController();
+                const saveTimeout = window.setTimeout(() => saveController.abort(), 5000);
+
+                fetch("api/submit_quiz.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ module_number: 5 }),
+                    credentials: "same-origin",
+                    signal: saveController.signal
+                })
+                .then(async (res) => {
+                    const data = await res.json();
+                    if (!res.ok || data.status !== "success") {
+                        throw new Error(data.message || "Unable to save your progress.");
+                    }
+                    resultElement.innerText = "Congratulations! You have completed all modules.";
+                    window.location.assign("dashboard.html");
+                })
+                .catch((err) => {
+                    resultElement.style.color = "red";
+                    resultElement.innerText = err.message === "Not logged in"
+                        ? "Your session has expired. Sign in again, then retake this quiz to save your progress."
+                        : `You passed Module 5, but progress could not be saved: ${err.name === "AbortError" ? "The request timed out." : err.message}`;
+                })
+                .finally(() => window.clearTimeout(saveTimeout));
+            } else {
+                resultElement.style.color = "red";
+                resultElement.innerText = "Some answers were incorrect. Review the lesson and try again!";
+            }
+        });
+    </script>
+</body>
+</html>
